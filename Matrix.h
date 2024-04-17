@@ -133,15 +133,48 @@ public:
         columns++;
     }
     
-    void removeRow(int row){
+    void removeRow(int row){ // parecido al addrow se hace lo mismo pero quitandole la fila row en vez de añadirle uno
+        if (row < 0 || row >= rows)
+            throw runtime_error("Invalid row");
         
+        E** temp = new E*[rows-1];
+        int indiceNuevo = 0; // se van contando los nuevos indices porque no se sabe en que indice del viejo esta el valor que se quiere borrar
+        for (int i = 0; i < rows; i++){
+            if (i!= row){
+                temp[indiceNuevo] = matrix[i]; // se añaden todos los valores de la matriz a la nueva mientras sean diferentes del indice ingresado
+                indiceNuevo++;
+            }
+            else {
+                delete[] matrix[i]; // si es igual a la matriz que se desea borrar se borra de una vez porque sino queda ahi y hay fuga de memoria
+            }
+        }
+        delete[] matrix; // se borra el arreglo de punteros viejo, no me acuerdo si era necesario pero como ya no se usa podemos aprovechar para borrarlo de una vez ya que está vacio.
+        matrix = temp; //por lo que ahora apunta al nuevo y temp no hace falta borrarlo
+        rows--;
     }
     
-    void removeColumn(int column){
+    void removeColumn(int column){ // este estaba FEO
+        if (column < 0 || column >= columns)
+            throw runtime_error("Invalid column");
         
+        E** temp = new E*[rows]; // se crea el arreglo de punteros
+        for (int i = 0; i < rows; i++) {
+            temp[i] = new E[rows - 1]; // se crea de tamaño fila menos 1 porque se elimina el ultimo elemento de cada columna
+            int tempIndex = 0; // se lleva la cuenta del nuevo indice, igual que en row
+            
+            for (int j = 0; j < columns; j++) {
+                if (j != column) {
+                    temp[i][tempIndex] = matrix[i][j]; //para cada columna, mientras no sea la que se va a borrar pase los datos a la nueva (temp)
+                    tempIndex++;
+                }
+            }
+            delete[] matrix[i]; //al haber añadido los valores de las nuevas filas, se elimina la fila vieja despues de completar el primer ciclo
+        } // aqui no borre matrix e igual sirvió
+        matrix = temp;
+        columns--;
     }
     
-    void print(){
+    void print(){ // estaba implementada en el video de la explicacion de matrices no hacia falta agregar mas
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
                 cout << getValue(i, j) << "\t";
@@ -149,8 +182,5 @@ public:
             cout << endl;
         }
     }
-    
 };
-
-#endif /* Matrix_h */
-
+#endif /* Matrix_h */   // no se si hace falta esto?
