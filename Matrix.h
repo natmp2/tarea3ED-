@@ -29,7 +29,7 @@ public:
         this->columns = columns;
         matrix = new E*[rows]; //puntero matrix se le asigna la direccion de memoria de un nuevo arreglo de tipo puntero a E
         for (int i = 0; i < rows; i++) {
-            matrix[i] = new E[columns]; // para cada fila asignele un puntero a columnas?
+            matrix[i] = new E[columns]; // para cada fila se asigna "columns" elementos tipo E
         }
     }
     ~Matrix() {
@@ -73,7 +73,7 @@ public:
     
     void transpose(){
         int cantCol = columns; // para despues hacer el intercambio de la cantidad de rows y columns
-        E** matrixTranspuesta = new E* [columns]; //tambien podia ser rows
+        E** matrixTranspuesta = new E* [columns]; 
         for (int i = 0; i < columns; i++) {
             matrixTranspuesta[i] = new E[rows]; // se crea la cantidad de rows como el tamaño de las columns
         }
@@ -107,7 +107,7 @@ public:
             tempRow[rows][j] = value; //se asigna la nueva fila con los valores de value
         }
         // no se borra temp
-        matrix = tempRow; // no me estaba dejando usar matrix->temp por alguna razon
+        matrix = tempRow; 
         rows++;
     
     }
@@ -133,14 +133,18 @@ public:
         columns++;
     }
     
-    void removeRow(int row){ // parecido al addrow se hace lo mismo pero quitandole la fila row en vez de añadirle uno
+    void removeRow(int row) { // parecido al addrow se hace lo mismo pero quitandole la fila row en vez de añadirle uno
         if (row < 0 || row >= rows)
             throw runtime_error("Invalid row");
-        
-        E** temp = new E*[rows-1];
+
+        if (rows == 1) {
+            throw runtime_error("Cannot remove the last row"); // no se elimina si es la última fila
+        }
+
+        E** temp = new E * [rows - 1];
         int indiceNuevo = 0; // se van contando los nuevos indices porque no se sabe en que indice del viejo esta el valor que se quiere borrar
-        for (int i = 0; i < rows; i++){
-            if (i!= row){
+        for (int i = 0; i < rows; i++) {
+            if (i != row) {
                 temp[indiceNuevo] = matrix[i]; // se añaden todos los valores de la matriz a la nueva mientras sean diferentes del indice ingresado
                 indiceNuevo++;
             }
@@ -149,19 +153,23 @@ public:
             }
         }
         delete[] matrix; // se borra el arreglo de punteros viejo, no me acuerdo si era necesario pero como ya no se usa podemos aprovechar para borrarlo de una vez ya que está vacio.
-        matrix = temp; //por lo que ahora apunta al nuevo y temp no hace falta borrarlo
+        matrix = temp; // por lo que ahora apunta al nuevo y temp no hace falta borrarlo
         rows--;
     }
-    
-    void removeColumn(int column){ // este estaba FEO
+
+    void removeColumn(int column) {
         if (column < 0 || column >= columns)
             throw runtime_error("Invalid column");
-        
-        E** temp = new E*[rows]; // se crea el arreglo de punteros
+
+        if (columns == 1) {
+            throw runtime_error("Cannot remove the last column"); // no se elimina si es la última columna
+        }
+
+        E** temp = new E * [rows]; // se crea el arreglo de punteros
         for (int i = 0; i < rows; i++) {
-            temp[i] = new E[rows - 1]; // se crea de tamaño fila menos 1 porque se elimina el ultimo elemento de cada columna
-            int tempIndex = 0; // se lleva la cuenta del nuevo indice, igual que en row
-            
+            temp[i] = new E[columns - 1]; // asigna dinámicamente memoria para una fila de la matriz temporal temp, donde cada fila tiene columns - 1 elementos del tipo E
+            int tempIndex = 0;
+
             for (int j = 0; j < columns; j++) {
                 if (j != column) {
                     temp[i][tempIndex] = matrix[i][j]; //para cada columna, mientras no sea la que se va a borrar pase los datos a la nueva (temp)
@@ -169,10 +177,11 @@ public:
                 }
             }
             delete[] matrix[i]; //al haber añadido los valores de las nuevas filas, se elimina la fila vieja despues de completar el primer ciclo
-        } // aqui no borre matrix e igual sirvió
+        }
         matrix = temp;
         columns--;
     }
+
     
     void print(){ // estaba implementada en el video de la explicacion de matrices no hacia falta agregar mas
         for (int i = 0; i < rows; i++) {
@@ -183,4 +192,4 @@ public:
         }
     }
 };
-#endif /* Matrix_h */   // no se si hace falta esto?
+#endif
